@@ -1,0 +1,8 @@
+s3_bucket='my-build-artifacts'  # REQUIRED
+s3_prefix='lambda-deploys/static-site-poc'
+
+# cf_logging_bucket='logging-bucket'
+# cf_logging_prefix='cloudfront-logs/'
+# cf_ssl_cn='name.example.com'
+# cf_ssl_dom='example.com'
+# cf_ssl_zid='Z123456789ABCD'
