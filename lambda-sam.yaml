@@ -1,0 +1,26 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Lambda deployment for Lambda@Edge function
+
+Globals:
+  Function:
+    Runtime: python3.8
+    Timeout: 30
+    MemorySize: 3008
+
+Resources:
+  LambdaFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-cf-request'
+      CodeUri: app/
+      Handler: lambda_handler.cf_request
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/lambda-edge-basic'
+      AutoPublishAlias: 'EDGEVERSION'
+
+Outputs:
+  LambdaArn:
+    Description: Arn of Lambda function
+    Value: !GetAtt LambdaFn.Arn
