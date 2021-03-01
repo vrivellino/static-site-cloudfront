@@ -2,6 +2,37 @@ import base64
 import json
 
 
+def response_200(body, content_type):
+    return {
+        'status': 200,
+        'headers': {
+            'content-type': [{'key': 'Content-Type', 'value': content_type}],
+            'cache-control': [{'key': 'Cache-Control', 'value': 'no-cache'}]
+        },
+        'body': body
+    }
+
+
+def response_4xx(code):
+    if code == 403:
+        return {
+            'status': 403,
+            'headers': {'content-type': [{'key': 'Content-Type', 'value': 'text/plain'}]},
+            'body': '403 Forbidden'
+        }
+    if code == 404:
+        return {
+            'status': 404,
+            'headers': {'cache-control': [{'key': 'Cache-Control', 'value': 'public, max-age=60'}]}
+        }
+    if code == 405:
+        return {
+            'status': 405,
+            'headers': {'content-type': [{'key': 'Content-Type', 'value': 'text/plain'}]},
+            'body': '405 Method Not Allowed'
+        }
+
+
 def echo_request(cf_request):
     ''' Processes a Cloudfront request and returns the contents as a response '''
     print(f'REQUEST: {json.dumps(cf_request)}')
@@ -27,14 +58,7 @@ def echo_request(cf_request):
             cf_response_body += f'\nREQUEST BODY (trunated)\n{request_body}\n'
         else:
             cf_response_body += f'\nREQUEST BODY\n{request_body}\n'
-    return {
-        'status': 200,
-        'headers': {
-            'content-type': [{'key': 'Content-Type', 'value': 'text/plain'}],
-            'cache-control': [{'key': 'Cache-Control', 'value': 'no-cache'}]
-        },
-        'body': cf_response_body
-    }
+    return response_200(cf_response_body, 'text/plain')
 
 
 def cf_request(event, context):
@@ -52,7 +76,7 @@ def cf_request(event, context):
     print(f'{client_ip} [{request_id}] {event_type} {dist_domain_name}/{dist_id} "{request_method} {request_uri}"')
     if request_uri == '/api/echo':
         return echo_request(cf_request)
-    return {'status': 404, 'headers': {'cache-control': [{'key': 'Cache-Control', 'value': 'public, max-age=60'}]}}
+    return response_4xx(404)
 
 
 if __name__ == '__main__':
